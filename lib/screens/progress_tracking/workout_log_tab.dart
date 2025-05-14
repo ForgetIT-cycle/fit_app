@@ -50,11 +50,13 @@ class _WorkoutLogTabState extends State<WorkoutLogTab> {
     if (activityName.toLowerCase().contains("run")) return Icons.directions_run;
     if (activityName.toLowerCase().contains("swim")) return Icons.pool;
     if (activityName.toLowerCase().contains("lift") ||
-        activityName.toLowerCase().contains("workout"))
+        activityName.toLowerCase().contains("workout")) {
       return Icons.fitness_center;
+    }
     if (activityName.toLowerCase().contains("cycle") ||
-        activityName.toLowerCase().contains("bike"))
+        activityName.toLowerCase().contains("bike")) {
       return Icons.directions_bike;
+    }
     return Icons.fitness_center; // Default icon
   }
 
