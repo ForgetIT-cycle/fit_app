@@ -1,4 +1,5 @@
-# FitApp - Project Summary and Run Instructions
+# FitApp - Project Summary and Run Instructions (Free for use made by forgeIT-cycle)
+
 
 ## 1. Project Overview
 
