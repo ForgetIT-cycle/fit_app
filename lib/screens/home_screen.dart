@@ -1,4 +1,5 @@
 import "package:fit_app/screens/workout_page.dart";
+import "package:fit_app/screens/free_roam_page.dart";
 import "package:flutter/material.dart";
 
 class HomeScreen extends StatelessWidget {
@@ -28,6 +29,8 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             _buildQuickStartCard(context),
+            const SizedBox(height: 16),
+            _buildFreeRoamCard(context),
             const SizedBox(height: 24),
             // Add other home screen elements here later if needed
             // For example, a summary of recent activity or daily goals.
@@ -84,6 +87,60 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       "Choose from predefined exercises and track your time.",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFreeRoamCard(BuildContext context) {
+    return Card(
+      elevation: 4.0,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FreeRoamPage()),
+          );
+        },
+        borderRadius: BorderRadius.circular(16.0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+          child: Row(
+            children: [
+              Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Free Roam",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Create your own workout from a list of exercises.",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(
                           context,

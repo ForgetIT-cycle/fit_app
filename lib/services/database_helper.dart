@@ -51,8 +51,11 @@ class DatabaseHelper {
   _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path,
-        version: _databaseVersion, onCreate: _onCreate);
+    return await openDatabase(
+      path,
+      version: _databaseVersion,
+      onCreate: _onCreate,
+    );
   }
 
   // SQL code to create the database tables.
@@ -65,7 +68,6 @@ class DatabaseHelper {
         $columnWeightKg REAL,
         $columnHeightCm REAL,
         $columnOnboardingComplete INTEGER NOT NULL DEFAULT 0
-        // Add other fields here
       )
       """);
 
@@ -101,16 +103,29 @@ class DatabaseHelper {
   }
 
   // Query rows based on a WHERE clause.
-  Future<List<Map<String, dynamic>>> queryRows(String table, {String? where, List<Object?>? whereArgs}) async {
+  Future<List<Map<String, dynamic>>> queryRows(
+    String table, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
     Database db = await instance.database;
     return await db.query(table, where: where, whereArgs: whereArgs);
   }
 
   // Update a row in the database.
-  Future<int> update(String table, Map<String, dynamic> row, String columnIdName, int id) async {
+  Future<int> update(
+    String table,
+    Map<String, dynamic> row,
+    String columnIdName,
+    int id,
+  ) async {
     Database db = await instance.database;
-    return await db.update(table, row, where: 
-    "$columnIdName = ?", whereArgs: [id]);
+    return await db.update(
+      table,
+      row,
+      where: "$columnIdName = ?",
+      whereArgs: [id],
+    );
   }
 
   // Delete a row from the database.
@@ -120,7 +135,9 @@ class DatabaseHelper {
   }
 
   // Example: Get workout logs for a specific date
-  Future<List<Map<String, dynamic>>> getWorkoutLogsForDate(String dateYYYYMMDD) async {
+  Future<List<Map<String, dynamic>>> getWorkoutLogsForDate(
+    String dateYYYYMMDD,
+  ) async {
     Database db = await instance.database;
     return await db.query(
       tableWorkoutLog,
@@ -137,7 +154,9 @@ class DatabaseHelper {
   }
 
   // Get recent workout logs for the charts tab
-  Future<List<Map<String, dynamic>>> getRecentWorkoutLogs({int limit = 5}) async {
+  Future<List<Map<String, dynamic>>> getRecentWorkoutLogs({
+    int limit = 5,
+  }) async {
     Database db = await instance.database;
     return await db.query(
       tableWorkoutLog,
@@ -161,9 +180,8 @@ class DatabaseHelper {
       GROUP BY month
       ORDER BY month ASC
       LIMIT 4;
-      """ );
+      """);
   }
 
   // Add more specific methods for UserSettings, etc., as needed.
 }
-

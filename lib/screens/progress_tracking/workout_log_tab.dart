@@ -50,14 +50,12 @@ class _WorkoutLogTabState extends State<WorkoutLogTab> {
     if (activityName.toLowerCase().contains("run")) return Icons.directions_run;
     if (activityName.toLowerCase().contains("swim")) return Icons.pool;
     if (activityName.toLowerCase().contains("lift") ||
-        activityName.toLowerCase().contains("workout")) {
+        activityName.toLowerCase().contains("workout"))
       return Icons.fitness_center;
-    }
     if (activityName.toLowerCase().contains("cycle") ||
-        activityName.toLowerCase().contains("bike")) {
+        activityName.toLowerCase().contains("bike"))
       return Icons.directions_bike;
-    }
-    return Icons.fitness_center; // Default icon
+    return Icons.sports; // Default icon
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -92,26 +90,157 @@ class _WorkoutLogTabState extends State<WorkoutLogTab> {
     }
   }
 
-  // Placeholder for adding a new workout log
+  // Add a new workout log
   Future<void> _addWorkoutLogDialog() async {
-    // For now, let's add a dummy entry to test
-    final newLog = {
-      DatabaseHelper.columnUserId: 1, // Assuming a default user for now
-      DatabaseHelper.columnActivityName: "Evening Walk",
-      DatabaseHelper.columnDateCompleted: DateFormat(
-        "yyyy-MM-dd",
-      ).format(_selectedDay),
-      DatabaseHelper.columnDurationMinutes: 30,
-      DatabaseHelper.columnCaloriesBurned: 150,
-      DatabaseHelper.columnSteps: 3000,
-    };
-    await _dbHelper.insertWorkoutLog(newLog);
-    _loadActivitiesForDay(_selectedDay); // Refresh the list
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Dummy workout log added!")));
+    // Show a dialog to input workout details
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _buildAddWorkoutDialog(),
+    );
+
+    if (result != null) {
+      // Add the workout to the database
+      final newLog = {
+        DatabaseHelper.columnUserId: 1, // Assuming a default user for now
+        DatabaseHelper.columnActivityName: result['name'],
+        DatabaseHelper.columnDateCompleted: DateFormat(
+          "yyyy-MM-dd",
+        ).format(_selectedDay),
+        DatabaseHelper.columnDurationMinutes: result['duration'],
+        DatabaseHelper.columnCaloriesBurned: result['calories'],
+        DatabaseHelper.columnSteps: result['steps'],
+      };
+
+      await _dbHelper.insertWorkoutLog(newLog);
+      _loadActivitiesForDay(_selectedDay); // Refresh the list
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${result['name']} workout added!")),
+        );
+      }
     }
+  }
+
+  // Build the dialog for adding a new workout
+  Widget _buildAddWorkoutDialog() {
+    final formKey = GlobalKey<FormState>();
+    String activityName = "";
+    int duration = 0;
+    int calories = 0;
+    int steps = 0;
+
+    return AlertDialog(
+      title: const Text("Add Workout"),
+      content: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Activity Name",
+                  hintText: "e.g., Morning Run",
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter an activity name";
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  activityName = value ?? "";
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Duration (minutes)",
+                  hintText: "e.g., 30",
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter duration";
+                  }
+                  if (int.tryParse(value) == null || int.parse(value) <= 0) {
+                    return "Please enter a valid duration";
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  duration = int.tryParse(value ?? "0") ?? 0;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Calories Burned",
+                  hintText: "e.g., 150",
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter calories";
+                  }
+                  if (int.tryParse(value) == null || int.parse(value) < 0) {
+                    return "Please enter a valid calorie count";
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  calories = int.tryParse(value ?? "0") ?? 0;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Steps (optional)",
+                  hintText: "e.g., 3000",
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    if (int.tryParse(value) == null || int.parse(value) < 0) {
+                      return "Please enter a valid step count";
+                    }
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  steps = int.tryParse(value ?? "0") ?? 0;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (formKey.currentState?.validate() ?? false) {
+              formKey.currentState?.save();
+              Navigator.of(context).pop({
+                'name': activityName,
+                'duration': duration,
+                'calories': calories,
+                'steps': steps,
+              });
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            foregroundColor: Colors.black87,
+          ),
+          child: const Text("Add"),
+        ),
+      ],
+    );
   }
 
   @override

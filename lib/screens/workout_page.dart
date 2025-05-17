@@ -221,8 +221,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   Widget _buildActiveWorkoutView() {
-    if (_selectedWorkout == null)
+    if (_selectedWorkout == null) {
       return Container(); // Should not happen if logic is correct
+    }
 
     return Padding(
       padding: const EdgeInsets.all(24.0),

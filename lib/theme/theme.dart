@@ -115,3 +115,10 @@ ThemeData fitAppTheme = ThemeData(
   ),
   // Add other theme properties as needed based on image analysis
 );
+
+// mute this to revert colors to default
+final ThemeData appTheme = ThemeData(
+  brightness: Brightness.dark,
+  primarySwatch: Colors.blue,
+  scaffoldBackgroundColor: Colors.grey[900],
+);
